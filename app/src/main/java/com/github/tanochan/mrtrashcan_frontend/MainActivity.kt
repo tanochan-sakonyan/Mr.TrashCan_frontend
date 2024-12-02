@@ -11,6 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.github.tanochan.mrtrashcan_frontend.feature.map.mapScreen
+import com.github.tanochan.mrtrashcan_frontend.feature.map.mapScreenHost
+import com.github.tanochan.mrtrashcan_frontend.feature.register.registerScreenHost
+import com.github.tanochan.mrtrashcan_frontend.feature.screens
 import com.github.tanochan.mrtrashcan_frontend.ui.theme.MrTrashCan_frontendTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,30 +26,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MrTrashCan_frontendTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+            val navController = rememberNavController()
+            NavHost(
+                navController = navController,
+                startDestination = "Map",
+            ){
+                composable(screens.Map.route){
+                    mapScreenHost(
+                        navigateToRegister = {
+                            navController.navigate(screens.Register.route)
+                        }
+                    )
+                }
+                composable(screens.Register.route){
+                    registerScreenHost(
+                        navigateToMap = {
+                            navController.popBackStack()
+                        }
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MrTrashCan_frontendTheme {
-        Greeting("Android")
     }
 }
