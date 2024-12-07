@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -14,6 +15,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.tanochan.mrtrashcan_frontend.R
+import com.github.tanochan.mrtrashcan_frontend.feature.RequestLocationPermission
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -32,27 +40,26 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun mapScreenHost(
+fun MapScreenHost(
     navigateToRegister: () -> Unit
 ){
-    mapScreen(
-        onFabClick = navigateToRegister
+    val mapViewModel: MapViewModel = viewModel()
+    MapScreen(
+        onFabClick = navigateToRegister,
+        mapViewModel = mapViewModel
     )
 }
 
 @Composable
-fun mapScreen(
-        onFabClick: () -> Unit
+fun MapScreen(
+        onFabClick: () -> Unit,
+        mapViewModel: MapViewModel
 ){
+    val currentLocation by mapViewModel.currentLocation.collectAsState()
+
     Box(modifier = Modifier.fillMaxSize()){
-        //TODO: ここにバックから取得した現在地を入力
         // カメラの初期位置を設定（例: 東京駅）
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(
-                LatLng(35.681236, 139.767125), // 東京駅の座標
-                15f // ズームレベル
-            )
-        }
+        val cameraPositionState = rememberCameraPositionState()
 
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -75,6 +82,33 @@ fun mapScreen(
                     // 必要に応じてカスタムアイコンを設定
                     // icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
                 )
+            }
+
+            currentLocation?.let { location ->
+                Marker(
+                    state = MarkerState(position = location),
+                    title = "現在地",
+                    snippet = "あなたの現在地",
+                    // カスタムアイコンを使用する場合は以下を有効にして画像を指定
+                    // icon = BitmapDescriptorFactory.fromResource(R.drawable.current_location_marker)
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE) // 青色のデフォルトマーカー
+                )
+            }
+        }
+
+        // 現在地のパーミッションを要求
+        RequestLocationPermission (
+            onPermissionGranted = {
+                mapViewModel.fetchCurrentLocation()
+            },
+            onPermissionDenied = {
+            }
+        )
+
+        // 現在地が更新されたらカメラを移動
+        currentLocation?.let { location ->
+            LaunchedEffect(location) {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(location, 15f))
             }
         }
 
@@ -134,7 +168,7 @@ fun mapScreen(
             Icon(
                 painter = painterResource(id = R.drawable.near_me),
                 contentDescription = "Near Me",
-                tint = Color.Green
+                tint = Color.Green,
             )
         }
 
@@ -168,10 +202,4 @@ fun mapScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun mapScreenPreview(){
-    mapScreen(onFabClick = {})
 }

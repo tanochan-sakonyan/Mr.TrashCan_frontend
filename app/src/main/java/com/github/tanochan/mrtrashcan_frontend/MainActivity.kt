@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.tanochan.mrtrashcan_frontend.feature.map.mapScreenHost
+import com.github.tanochan.mrtrashcan_frontend.feature.map.MapScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.register.RegisterScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.screens
 
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                 startDestination = "Map",
             ){
                 composable(screens.Map.route){
-                    mapScreenHost(
+                    MapScreenHost(
                         navigateToRegister = {
                             navController.navigate(screens.Register.route)
                         }
