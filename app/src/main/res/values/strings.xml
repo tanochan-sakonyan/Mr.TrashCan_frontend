@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Mr.TrashCan_frontend</string>
+    <string name="google_maps_key">AIzaSyDbzC_XWCgFxIJoq8SxbCE-AY5CMTcJCLE</string>
 </resources>
