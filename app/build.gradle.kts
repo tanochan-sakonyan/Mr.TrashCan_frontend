@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
+//    id("com.google.devtools.ksp")
+    id("kotlin-kapt")
 }
 
 android {
@@ -73,6 +74,6 @@ dependencies {
     implementation(libs.androidx.camera.extensions)
     implementation(libs.coil.compose)
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler.v244)
+    kapt(libs.hilt.android.compiler.v244)
     implementation(libs.okhttp)
 }
