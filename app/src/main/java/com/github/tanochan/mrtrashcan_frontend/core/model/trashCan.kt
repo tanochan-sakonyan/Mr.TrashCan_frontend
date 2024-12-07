@@ -1,6 +1,7 @@
-package com.github.tanochan.mrtrashcan_frontend.entity.trash
+package com.github.tanochan.mrtrashcan_frontend.core.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.File
 
 data class TrashCan (
     @SerializedName("id")
@@ -9,11 +10,11 @@ data class TrashCan (
     @SerializedName("latitude")
     val latitude: Double,
 
-    @SerializedName("logitude")
+    @SerializedName("longitude")
     val longitude: Double,
 
     @SerializedName("image")
-    val image: String,
+    val image: File,
 
     @SerializedName("trashType")
     val trashType: List<String>,
