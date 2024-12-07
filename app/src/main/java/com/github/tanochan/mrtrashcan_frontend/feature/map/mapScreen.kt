@@ -2,31 +2,21 @@ package com.github.tanochan.mrtrashcan_frontend.feature.map
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -97,7 +87,7 @@ fun mapScreen(
             containerColor = Color.White
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.search_24px),
+                painter = painterResource(id = R.drawable.search),
                 contentDescription = "Search",
                 tint = Color.Green
             )
@@ -112,7 +102,7 @@ fun mapScreen(
             containerColor = Color.White
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.settings_24px),
+                painter = painterResource(id = R.drawable.settings),
                 contentDescription = "Setting",
                 tint = Color.Green
             )
@@ -127,7 +117,7 @@ fun mapScreen(
             containerColor = Color.White
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.filter_alt_24px),
+                painter = painterResource(id = R.drawable.filter_alt),
                 contentDescription = "Filter",
                 tint = Color.Green
             )
@@ -142,7 +132,7 @@ fun mapScreen(
             containerColor = Color.White
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.near_me_24px),
+                painter = painterResource(id = R.drawable.near_me),
                 contentDescription = "Near Me",
                 tint = Color.Green
             )
@@ -162,7 +152,7 @@ fun mapScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.delete_24px),
+                    painter = painterResource(id = R.drawable.delete),
                     contentDescription = "trashcan",
                     tint = Color.White
                 )
