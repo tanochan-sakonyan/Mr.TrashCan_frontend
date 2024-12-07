@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.tanochan.mrtrashcan_frontend.core.ApiService
+import com.github.tanochan.mrtrashcan_frontend.core.PreferencesManager
 import com.github.tanochan.mrtrashcan_frontend.core.model.TrashCan
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val fusedLocationClient: FusedLocationProviderClient,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val preferencesManager: PreferencesManager
 ): ViewModel() {
 
     fun getTrashCanList(latitude: Double, longitude: Double, onResult: (List<TrashCan>?) -> Unit) {
@@ -39,6 +41,10 @@ class MapViewModel @Inject constructor(
     private val _currentLocation = MutableStateFlow<LatLng?>(null)
     val currentLocation: StateFlow<LatLng?> = _currentLocation
 
+    fun saveCurrentLocation(location: LatLng) {
+        preferencesManager.saveLocation(location)
+    }
+
     @SuppressLint("MissingPermission")
     fun fetchCurrentLocation() {
         viewModelScope.launch {
@@ -46,6 +52,7 @@ class MapViewModel @Inject constructor(
                 val location = fusedLocationClient.lastLocation.await()
                 if (location != null) {
                     _currentLocation.value = LatLng(location.latitude, location.longitude)
+                    saveCurrentLocation(currentLocation.value!!)
                     Log.d(TAG, "Location fetched: ${location.latitude}, ${location.longitude}")
                 } else {
                     Log.d(TAG, "Location is null")

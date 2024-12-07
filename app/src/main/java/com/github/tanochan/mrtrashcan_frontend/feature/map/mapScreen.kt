@@ -3,6 +3,7 @@ package com.github.tanochan.mrtrashcan_frontend.feature.map
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -186,7 +187,15 @@ fun MapScreen(
         }
 
         Button(
-            onClick = onFabClick,
+            onClick = {
+                currentLocation?.let { location ->
+                    mapViewModel.saveCurrentLocation(location)
+                    onFabClick()
+                }
+
+                //デバッグ用、後で消す
+                Log.d("map","current_location_is:{${currentLocation!!.latitude},${currentLocation!!.longitude}}")
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 32.dp)

@@ -1,5 +1,6 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.feature.register.component.CustomElevatedButton
+import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun RegisterScreenHost(
@@ -53,8 +57,16 @@ fun RegisterScreenHost(
     navigateToCamera: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.loadCurrentLocation()
+    }
+
     RegisterScreen(
-        onBack = navigateToMap,
+        onBack = {
+            viewModel.clearCurrentLocation();
+            viewModel.logCurrentLocation();
+            navigateToMap()
+                 },
         onCameraClick = { navigateToCamera() },
         viewModel = viewModel
     )
@@ -80,6 +92,8 @@ fun RegisterScreen(
     val photoUri = viewModel.photoUri.value
 
     var note by remember { mutableStateOf("") }
+
+    val currentLocation by viewModel.currentLocation.collectAsState()
 
     Scaffold(
         topBar = {
@@ -109,7 +123,11 @@ fun RegisterScreen(
                             )
                             .clip(shape = RoundedCornerShape(35.dp))
                             .background(Color.Green)
-                            .clickable { onBack() },
+                            .clickable {
+                                onBack();
+                                //デバッグ用、後で消す
+                                Log.d("map","current_location_is:{${currentLocation?.latitude},${currentLocation?.longitude}}")
+                            },
                     ) {
                         Text(
                             modifier = Modifier.align(Alignment.Center),
@@ -133,6 +151,13 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(20.dp))
+
+            //TODO 消して
+            //絶対消す、デバッグ用
+            currentLocation?.let {
+                Text(text = "現在地: ${it.latitude}, ${it.longitude}")
+            }
+
             Row(
                 modifier = Modifier.align(Alignment.Start)
             ) {
