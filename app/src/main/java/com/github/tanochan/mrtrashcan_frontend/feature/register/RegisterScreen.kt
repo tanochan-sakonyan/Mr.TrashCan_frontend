@@ -1,6 +1,5 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -72,6 +70,12 @@ fun RegisterScreen(
     var landmark by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
     val photoUri = viewModel.photoUri.value
+
+    var isBurningSelected by remember { mutableStateOf(false) }
+    var isUnBurningSelected by remember { mutableStateOf(false) }
+    var isCanSelected by remember { mutableStateOf(false) }
+    var isBottleSelected by remember { mutableStateOf(false) }
+    var isPetBottleSelected by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -156,42 +160,46 @@ fun RegisterScreen(
 
                 ) {
                 IconButton(
-                    onClick = { }
+                    onClick = { isBurningSelected = !isBurningSelected }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.burning),
+                        painter = painterResource(id = if (isBurningSelected) R.drawable.burning_on else R.drawable.burning_off),
                         contentDescription = "burning",
                     )
                 }
                 IconButton(
-                    onClick = { }
+                    onClick = { isUnBurningSelected = !isUnBurningSelected }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.unburning),
+                        painter = painterResource(id = if (isUnBurningSelected) R.drawable.unburning_on else R.drawable.unburning_off),
                         contentDescription = "unburning",
                     )
                 }
                 IconButton(
-                    onClick = { }
+                    onClick = { isCanSelected = !isCanSelected }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.can),
+                        painter = painterResource(
+                            id = if (isCanSelected) R.drawable.can_on else R.drawable.can_off
+                        ),
                         contentDescription = "can",
                     )
                 }
                 IconButton(
-                    onClick = { }
+                    onClick = { isBottleSelected = !isBottleSelected }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.bottle),
+                        painter = painterResource(
+                            id = if (isBottleSelected) R.drawable.bottle_on else R.drawable.bottle_off
+                        ),
                         contentDescription = "bottle",
                     )
                 }
                 IconButton(
-                    onClick = { }
+                    onClick = { isPetBottleSelected = !isPetBottleSelected }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.pet_bottle),
+                        painter = painterResource(id = if (isPetBottleSelected) R.drawable.pet_bottle_on else R.drawable.pet_bottle_off),
                         contentDescription = "pet_bottle",
                     )
                 }
