@@ -1,5 +1,8 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,11 +46,12 @@ import com.github.tanochan.mrtrashcan_frontend.feature.register.component.Custom
 
 @Composable
 fun RegisterScreenHost(
-    navigateToMap: () -> Unit
+    navigateToMap: () -> Unit,
+    navigateToCamera: () -> Unit
 ) {
     RegisterScreen(
         onBack = navigateToMap,
-        onCameraClick = {}
+        onCameraClick = {navigateToCamera()}
     )
 }
 
@@ -358,7 +362,6 @@ fun RegisterScreen(
         }
     }
 }
-
 
 @Preview
 @Composable

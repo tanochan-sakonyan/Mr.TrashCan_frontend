@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.github.tanochan.mrtrashcan_frontend"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -67,5 +67,6 @@ dependencies {
     implementation(libs.androidx.camera.video)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.extensions)
+    implementation(libs.coil.compose)
 
 }
