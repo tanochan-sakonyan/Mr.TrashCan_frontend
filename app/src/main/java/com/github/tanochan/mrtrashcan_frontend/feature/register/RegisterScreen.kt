@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -43,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.tanochan.mrtrashcan_frontend.R
+import com.github.tanochan.mrtrashcan_frontend.feature.register.component.CustomElevatedButton
 
 @Composable
 fun RegisterScreenHost(
@@ -254,7 +256,24 @@ fun RegisterScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Row { }
+            Row (
+                modifier = Modifier.align(Alignment.Start).padding(start = 28.dp),
+            ){
+                CustomElevatedButton(
+                 title =    "改札内",
+                    onClick = { }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                CustomElevatedButton(
+                    title =    "建物内",
+                    onClick = { }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                CustomElevatedButton(
+                    title =    "屋外",
+                    onClick = { }
+                )
+            }
             Spacer(modifier = Modifier.height(20.dp))
             Row (
                 modifier = Modifier.align(Alignment.Start)
