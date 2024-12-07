@@ -1,5 +1,6 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,6 +20,8 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.tanochan.mrtrashcan_frontend.R
 
 @Composable
 fun RegisterScreenHost(
@@ -52,7 +58,8 @@ fun RegisterScreenHost(
 fun RegisterScreen(
     onBack: () -> Unit
 ) {
-    var value by remember { mutableStateOf("") }
+    var landmark by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -106,82 +113,172 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                modifier = Modifier
-                    .padding(start = 28.dp)
-                    .align(Alignment.Start),
-                text = "ゴミ種別",
-                style = TextStyle(
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
+            Row (
+                modifier = Modifier.align(Alignment.Start)
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(start = 28.dp),
+                    text = "ゴミ種別",
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
                 )
-            )
-            Row {
+                Text(
+                    text = "*",
+                    color = Color(0xFFF57474),
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 40.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+
+                ) {
                 IconButton(
                     onClick = { }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back"
+                    Image(
+                        painter = painterResource(id = R.drawable.burning),
+                        contentDescription = "burning",
                     )
                 }
                 IconButton(
                     onClick = { }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back"
+                    Image(
+                        painter = painterResource(id = R.drawable.unburning),
+                        contentDescription = "unburning",
                     )
                 }
                 IconButton(
                     onClick = { }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back"
+                    Image(
+                        painter = painterResource(id = R.drawable.can),
+                        contentDescription = "can",
                     )
                 }
                 IconButton(
                     onClick = { }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back"
+                    Image(
+                        painter = painterResource(id = R.drawable.bottle),
+                        contentDescription = "bottle",
                     )
                 }
                 IconButton(
                     onClick = { }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back"
+                    Image(
+                        painter = painterResource(id = R.drawable.pet_bottle),
+                        contentDescription = "pet_bottle",
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                modifier = Modifier
-                    .padding(start = 28.dp)
-                    .align(Alignment.Start),
-                text = "場所",
-                style = TextStyle(
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
+            Row (
+                modifier = Modifier.align(Alignment.Start)
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(start = 28.dp),
+                    text = "一番近いランドマーク",
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+                Text(
+                    text = "*",
+                    color = Color(0xFFF57474),
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            OutlinedTextField(
+                modifier = Modifier.size(width = 314.dp, height = 40.dp),
+                value = landmark,
+                onValueChange = { landmark = it },
+                label = {
+                    Text(
+                        "例）XX駅西口、ローソン、○○公園", style = TextStyle(
+                            fontSize = 12.sp,
+                        )
+                    )
+                },
+                shape = RoundedCornerShape(2.dp),
+                textStyle = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                ),
+                colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                    unfocusedBorderColor = Color.Black,
+                    focusedBorderColor = Color.Black,
+                    cursorColor = Color.Black,
                 )
             )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row (
+                modifier = Modifier.align(Alignment.Start)
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(start = 28.dp),
+                    text = "場所",
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+                Text(
+                    text = "*",
+                    color = Color(0xFFF57474),
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             Row { }
             Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                modifier = Modifier
-                    .padding(start = 28.dp)
-                    .align(Alignment.Start),
-                text = "写真",
-                style = TextStyle(
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
+            Row (
+                modifier = Modifier.align(Alignment.Start)
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(start = 28.dp),
+                    text = "写真",
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
                 )
-            )
+                Text(
+                    text = "*",
+                    color = Color(0xFFF57474),
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             // TODO camera
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -195,10 +292,29 @@ fun RegisterScreen(
                     fontWeight = FontWeight.Bold,
                 )
             )
-            TextField(
-                value = value,
-                onValueChange = { value = it },
-                label = { Text("備考") },
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                modifier = Modifier.size(width = 314.dp, height = 100.dp),
+                value = landmark,
+                onValueChange = { landmark = it },
+                label = {
+                    Text(
+                        "例）自販機横、トイレ横", style = TextStyle(
+                            fontSize = 12.sp,
+                            color = Color(0xFFB9B9B9)
+                        )
+                    )
+                },
+                shape = RoundedCornerShape(2.dp),
+                textStyle = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                ),
+                colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                    unfocusedBorderColor = Color(0xFFB9B9B9),
+                    focusedBorderColor = Color.Black,
+                    cursorColor = Color.Black,
+                )
             )
         }
     }
