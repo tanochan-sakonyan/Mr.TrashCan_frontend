@@ -9,7 +9,7 @@ data class TrashCan (
     @SerializedName("latitude")
     val latitude: Double,
 
-    @SerializedName("logitude")
+    @SerializedName("longitude")
     val longitude: Double,
 
     @SerializedName("image")
