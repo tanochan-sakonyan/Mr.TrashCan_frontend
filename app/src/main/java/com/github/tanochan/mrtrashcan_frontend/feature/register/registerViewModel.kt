@@ -1,10 +1,7 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,7 +60,6 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun updatePhotoUri(uri: String) {
-        Log.d("RegisterViewModel", "Updating photo URI to: $uri")
         photoUri.value = uri
         savedStateHandle["photoUri"] = uri
     }

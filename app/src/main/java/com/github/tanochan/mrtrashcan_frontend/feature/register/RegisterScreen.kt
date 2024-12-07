@@ -92,7 +92,11 @@ fun RegisterScreen(
                 },
                 navigationIcon = {
                     TextButton(
-                        onClick = onBack, modifier = Modifier.padding(start = 28.dp)
+                        onClick = {
+                            // TODO 内容リセット処理
+                            onBack()
+                        },
+                        modifier = Modifier.padding(start = 28.dp)
                     ) {
                         Text(
                             text = "キャンセル", style = TextStyle(
@@ -127,6 +131,7 @@ fun RegisterScreen(
                             )
                             .clickable (enabled = isPostable) {
                                 // TODO ゴミ箱登録処理
+                                // TODO 内容リセット処理
                                 onBack()
                             },
                     ) {
