@@ -3,7 +3,9 @@ package com.github.tanochan.mrtrashcan_frontend.feature.camera
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import android.Manifest
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageCapture
@@ -26,23 +28,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.github.tanochan.mrtrashcan_frontend.R
+import com.github.tanochan.mrtrashcan_frontend.feature.register.RegisterViewModel
 import java.io.File
 
 @Composable
 fun CameraScreenHost(
     navigateToRegister: () -> Unit,
+    registerViewModel: RegisterViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 ) {
     CameraScreen(
-        onBack = navigateToRegister
+        onBack = {
+            navigateToRegister()
+            Log.d("CameraScreenHost", "Navigating back to RegisterScreen")
+        },
+        onPhotoCaptured = { uri ->
+            Log.d("CameraScreenHost", "Captured photo URI: $uri")
+            registerViewModel.updatePhotoUri(uri)
+        }
     )
 }
 
 @Composable
 fun CameraScreen(
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    onPhotoCaptured: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     var photoUri by remember { mutableStateOf<String?>(null) }
@@ -147,7 +161,7 @@ fun CameraScreen(
                                 isPhotoCaptured = false
                                 photoUri = null
                             } else
-                            onBack()
+                                onBack()
                         }
                     ) {
                         if (isPhotoCaptured) {
@@ -169,40 +183,47 @@ fun CameraScreen(
                         modifier = Modifier.size(72.dp),
                         onClick = {
                             if (isPhotoCaptured) {
+                                photoUri?.let { uri ->
+                                    onPhotoCaptured(uri)
+                                }
                                 onBack()
                             } else
-                            imageCapture?.let { capture ->
-                                val photoFile = File(
-                                    context.externalCacheDir,
-                                    "IMG_${System.currentTimeMillis()}.jpg"
-                                )
-                                val outputOptions =
-                                    ImageCapture.OutputFileOptions.Builder(photoFile).build()
+                                imageCapture?.let { capture ->
+                                    val photoFile = File(
+                                        context.externalCacheDir,
+                                        "IMG_${System.currentTimeMillis()}.jpg"
+                                    )
+                                    val outputOptions =
+                                        ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-                                capture.takePicture(
-                                    outputOptions,
-                                    ContextCompat.getMainExecutor(context),
-                                    object : ImageCapture.OnImageSavedCallback {
-                                        override fun onError(exception: ImageCaptureException) {
-                                            Toast.makeText(
-                                                context,
-                                                "写真の保存に失敗しました",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
+                                    capture.takePicture(
+                                        outputOptions,
+                                        ContextCompat.getMainExecutor(context),
+                                        object : ImageCapture.OnImageSavedCallback {
+                                            override fun onError(exception: ImageCaptureException) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "写真の保存に失敗しました",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
 
-                                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                            Toast.makeText(
-                                                context,
-                                                "写真を保存しました: ${photoFile.absolutePath}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            photoUri = photoFile.absolutePath
-                                            isPhotoCaptured = true
+                                            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "写真を保存しました: ${photoFile.absolutePath}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                Log.d(
+                                                    "CameraScreen",
+                                                    "Photo saved: ${photoFile.absolutePath}"
+                                                )
+                                                photoUri = photoFile.absolutePath
+                                                isPhotoCaptured = true
+                                            }
                                         }
-                                    }
-                                )
-                            }
+                                    )
+                                }
                         }
                     ) {
                         if (isPhotoCaptured) {

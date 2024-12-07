@@ -27,10 +27,9 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun CustomElevatedButton(
     title: String,
+    isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    var isClicked by remember { mutableStateOf(false) }
-
     Box(
         modifier = Modifier
             .size(
@@ -39,16 +38,15 @@ fun CustomElevatedButton(
             )
             .clip(shape = RoundedCornerShape(6.dp))
             .background(
-                if (isClicked) Color(0xFF50BCA3) else
+                if (isSelected) Color(0xFF50BCA3) else
                     Color.White
             )
             .border(
                 width = 1.5.dp,
-                color = if (isClicked) Color.White else Color(0xFF50BCA3),
+                color = if (isSelected) Color.White else Color(0xFF50BCA3),
                 shape = RoundedCornerShape(6.dp)
             )
             .clickable {
-                isClicked = !isClicked
                 onClick()
             },
     ) {
@@ -59,7 +57,7 @@ fun CustomElevatedButton(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color =
-                if (isClicked) Color.White else
+                if (isSelected) Color.White else
                     Color(0xFF50BCA3)
             )
         )
@@ -68,6 +66,20 @@ fun CustomElevatedButton(
 
 @Preview
 @Composable
-fun CustomElevatedButtonPreview() {
-    CustomElevatedButton(title = "投稿") {}
+fun CustomElevatedButtonPreviewOff() {
+    CustomElevatedButton(
+        title = "投稿",
+        isSelected = false,
+        onClick = {}
+        )
+}
+
+@Preview
+@Composable
+fun CustomElevatedButtonPreviewOn() {
+    CustomElevatedButton(
+        title = "投稿",
+        isSelected = true,
+        onClick = {}
+    )
 }
