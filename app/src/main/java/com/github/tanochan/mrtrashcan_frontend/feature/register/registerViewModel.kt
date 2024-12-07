@@ -1,5 +1,11 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
+import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.tanochan.mrtrashcan_frontend.core.ApiService
@@ -13,8 +19,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
+
+    var photoUri: MutableState<String?> = mutableStateOf(savedStateHandle["photoUri"])
+        private set
+
+    fun updatePhotoUri(uri: String) {
+        Log.d("RegisterViewModel", "Updating photo URI to: $uri")
+        photoUri.value = uri
+        savedStateHandle["photoUri"] = uri
+    }
+
     fun registerTrashCan(latitude: Double, longitude: Double, trashType: List<String>, imageFile: File) {
         viewModelScope.launch {
             try {

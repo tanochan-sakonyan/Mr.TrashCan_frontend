@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.dagger.hilt.android")
-//    id("com.google.devtools.ksp")
     id("kotlin-kapt")
 }
 
@@ -76,4 +75,5 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler.v244)
     implementation(libs.okhttp)
+    implementation(libs.androidx.hilt.navigation.compose)
 }

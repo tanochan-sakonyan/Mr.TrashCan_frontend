@@ -12,9 +12,11 @@ import com.github.tanochan.mrtrashcan_frontend.feature.camera.CameraScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.map.mapScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.register.RegisterScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.screens
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

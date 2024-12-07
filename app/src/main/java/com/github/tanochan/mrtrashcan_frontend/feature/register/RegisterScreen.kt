@@ -1,5 +1,7 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -32,24 +35,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.feature.register.component.CustomElevatedButton
 
 @Composable
 fun RegisterScreenHost(
     navigateToMap: () -> Unit,
-    navigateToCamera: () -> Unit
+    navigateToCamera: () -> Unit,
+    viewModel: RegisterViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 ) {
     RegisterScreen(
         onBack = navigateToMap,
-        onCameraClick = {navigateToCamera()}
+        onCameraClick = { navigateToCamera() },
+        viewModel = viewModel
     )
 }
 
@@ -58,9 +67,11 @@ fun RegisterScreenHost(
 fun RegisterScreen(
     onBack: () -> Unit,
     onCameraClick: () -> Unit,
+    viewModel: RegisterViewModel,
 ) {
     var landmark by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
+    val photoUri = viewModel.photoUri.value
 
     Scaffold(
         topBar = {
@@ -308,16 +319,28 @@ fun RegisterScreen(
                         color = Color.Black,
                     )
             ) {
-                Box(
-                    modifier = Modifier.align(Alignment.Center)
-                ) {
-                    IconButton(
-                        onClick = onCameraClick,
+                if (photoUri != null) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clickable { onCameraClick() }
+                            .fillMaxSize()
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(photoUri),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = "Captured photo",
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clickable { onCameraClick() }
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.camera),
-                            contentDescription = "camera",
-                            modifier = Modifier.size(32.dp)
+                            contentDescription = "Take photo",
                         )
                     }
                 }
@@ -364,5 +387,5 @@ fun RegisterScreen(
 @Preview
 @Composable
 fun PreviewRegisterScreen() {
-    RegisterScreen(onBack = {}, onCameraClick = {})
+    RegisterScreen(onBack = {}, onCameraClick = {}, viewModel = viewModel())
 }
