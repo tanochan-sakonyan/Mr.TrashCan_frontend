@@ -233,7 +233,7 @@ fun RegisterScreen(
             }
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
-                modifier = Modifier.size(width = 314.dp, height = 40.dp),
+                modifier = Modifier.size(width = 314.dp, height = 60.dp),
                 value = landmark,
                 onValueChange = { landmark = it },
                 label = {
@@ -374,8 +374,8 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 modifier = Modifier.size(width = 314.dp, height = 100.dp),
-                value = landmark,
-                onValueChange = { landmark = it },
+                value = note,
+                onValueChange = { note = it },
                 label = {
                     Text(
                         "例）自販機横、トイレ横", style = TextStyle(
