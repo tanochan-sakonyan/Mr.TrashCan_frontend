@@ -2,6 +2,7 @@ package com.github.tanochan.mrtrashcan_frontend.feature.register
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,18 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,14 +46,16 @@ fun RegisterScreenHost(
     navigateToMap: () -> Unit
 ) {
     RegisterScreen(
-        onBack = navigateToMap
+        onBack = navigateToMap,
+        onCameraClick = {}
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onCameraClick: () -> Unit
 ) {
     var landmark by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
@@ -115,9 +112,9 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            Row (
+            Row(
                 modifier = Modifier.align(Alignment.Start)
-            ){
+            ) {
                 Text(
                     modifier = Modifier
                         .padding(start = 28.dp),
@@ -187,9 +184,9 @@ fun RegisterScreen(
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Row (
+            Row(
                 modifier = Modifier.align(Alignment.Start)
-            ){
+            ) {
                 Text(
                     modifier = Modifier
                         .padding(start = 28.dp),
@@ -233,9 +230,9 @@ fun RegisterScreen(
                 )
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Row (
+            Row(
                 modifier = Modifier.align(Alignment.Start)
-            ){
+            ) {
                 Text(
                     modifier = Modifier
                         .padding(start = 28.dp),
@@ -256,28 +253,30 @@ fun RegisterScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Row (
-                modifier = Modifier.align(Alignment.Start).padding(start = 28.dp),
-            ){
+            Row(
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(start = 28.dp),
+            ) {
                 CustomElevatedButton(
-                 title =    "改札内",
+                    title = "改札内",
                     onClick = { }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 CustomElevatedButton(
-                    title =    "建物内",
+                    title = "建物内",
                     onClick = { }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 CustomElevatedButton(
-                    title =    "屋外",
+                    title = "屋外",
                     onClick = { }
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Row (
+            Row(
                 modifier = Modifier.align(Alignment.Start)
-            ){
+            ) {
                 Text(
                     modifier = Modifier
                         .padding(start = 28.dp),
@@ -298,8 +297,29 @@ fun RegisterScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            // TODO camera
-
+            Box(
+                modifier = Modifier
+                    .size(height = 132.dp, width = 132.dp)
+                    .clip(shape = RoundedCornerShape(2.dp))
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                    )
+            ) {
+                Box(
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    IconButton(
+                        onClick = onCameraClick,
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.camera),
+                            contentDescription = "camera",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
             Text(
                 modifier = Modifier
@@ -343,5 +363,5 @@ fun RegisterScreen(
 @Preview
 @Composable
 fun PreviewRegisterScreen() {
-    RegisterScreen(onBack = {})
+    RegisterScreen(onBack = {}, onCameraClick = {})
 }
