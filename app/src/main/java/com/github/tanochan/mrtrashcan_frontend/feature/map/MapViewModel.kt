@@ -38,4 +38,8 @@ class MapViewModel(
             }
         }
     }
+
+    fun setDefaultLocation(defaultLocation: LatLng) {
+        _currentLocation.value = defaultLocation
+    }
 }

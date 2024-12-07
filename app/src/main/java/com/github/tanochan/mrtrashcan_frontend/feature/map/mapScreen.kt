@@ -107,7 +107,7 @@ fun MapScreen(
             },
             //拒否されたら東京駅をデフォルトの現在地に設定
             onPermissionDenied = {
-
+                mapViewModel.setDefaultLocation(LatLng(35.681236, 139.767125)) // 東京駅の座標
             }
         )
 
