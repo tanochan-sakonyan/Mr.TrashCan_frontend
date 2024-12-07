@@ -38,16 +38,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.feature.register.component.CustomElevatedButton
 
 @Composable
 fun RegisterScreenHost(
-    navigateToMap: () -> Unit
+    navigateToMap: () -> Unit,
+    navigateToCamera: () -> Unit
 ) {
     RegisterScreen(
         onBack = navigateToMap,
-        onCameraClick = {}
+        onCameraClick = {navigateToCamera()}
     )
 }
 
@@ -55,7 +57,7 @@ fun RegisterScreenHost(
 @Composable
 fun RegisterScreen(
     onBack: () -> Unit,
-    onCameraClick: () -> Unit
+    onCameraClick: () -> Unit,
 ) {
     var landmark by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
@@ -358,7 +360,6 @@ fun RegisterScreen(
         }
     }
 }
-
 
 @Preview
 @Composable
