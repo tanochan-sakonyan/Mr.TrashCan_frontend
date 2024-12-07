@@ -1,8 +1,5 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.register
 
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.feature.register.component.CustomElevatedButton
 
@@ -59,7 +57,7 @@ fun RegisterScreenHost(
 @Composable
 fun RegisterScreen(
     onBack: () -> Unit,
-    onCameraClick: () -> Unit
+    onCameraClick: () -> Unit,
 ) {
     var landmark by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
