@@ -82,6 +82,12 @@ fun RegisterScreen(
 
     var note by remember { mutableStateOf("") }
 
+    val isPostable = (isBurningSelected || isUnBurningSelected || isCanSelected ||
+            isBottleSelected || isPetBottleSelected) &&
+            landmark.isNotEmpty() &&
+            selectedButton.isNotEmpty() &&
+            photoUri != null
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -111,13 +117,19 @@ fun RegisterScreen(
                             .clip(shape = RoundedCornerShape(35.dp))
                             .background(
                                 brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0xFF75FF8C),
-                                        Color(0xFF4FBBA9)
+                                    colors = if(isPostable) {
+                                        listOf(
+                                            Color(0xFF50BCA3),
+                                            Color(0xFF4FBBA9)
+                                        )
+                                    } else
+                                    listOf(
+                                        Color(0xFF75FF8C).copy(alpha = 0.3f),
+                                        Color(0xFF4FBBA9).copy(alpha = 0.4f)
                                     )
                                 )
                             )
-                            .clickable {
+                            .clickable (enabled = isPostable) {
                                 // TODO ゴミ箱登録処理
                                 onBack()
                             },
