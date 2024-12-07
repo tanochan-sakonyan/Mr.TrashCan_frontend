@@ -67,15 +67,19 @@ fun RegisterScreen(
     onCameraClick: () -> Unit,
     viewModel: RegisterViewModel,
 ) {
-    var landmark by remember { mutableStateOf("") }
-    var note by remember { mutableStateOf("") }
-    val photoUri = viewModel.photoUri.value
-
     var isBurningSelected by remember { mutableStateOf(false) }
     var isUnBurningSelected by remember { mutableStateOf(false) }
     var isCanSelected by remember { mutableStateOf(false) }
     var isBottleSelected by remember { mutableStateOf(false) }
     var isPetBottleSelected by remember { mutableStateOf(false) }
+
+    var landmark by remember { mutableStateOf("") }
+
+    var selectedButton by remember { mutableStateOf("") }
+
+    val photoUri = viewModel.photoUri.value
+
+    var note by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -281,17 +285,20 @@ fun RegisterScreen(
             ) {
                 CustomElevatedButton(
                     title = "改札内",
-                    onClick = { }
+                    isSelected = selectedButton == "insideGate",
+                    onClick = { selectedButton = "insideGate" }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 CustomElevatedButton(
                     title = "建物内",
-                    onClick = { }
+                    isSelected = selectedButton == "insideBuilding",
+                    onClick = { selectedButton = "insideBuilding" }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 CustomElevatedButton(
                     title = "屋外",
-                    onClick = { }
+                    isSelected = selectedButton == "outside",
+                    onClick = { selectedButton = "outside" }
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
