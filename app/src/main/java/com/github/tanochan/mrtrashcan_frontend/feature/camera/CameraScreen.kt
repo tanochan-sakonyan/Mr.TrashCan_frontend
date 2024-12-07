@@ -10,18 +10,24 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import coil.compose.rememberAsyncImagePainter
+import com.github.tanochan.mrtrashcan_frontend.R
 import java.io.File
 
 @Composable
@@ -65,25 +71,108 @@ fun CameraScreen(
 
     if (!hasCameraPermission) return
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp // 画面の高さをdpで取得
+    val topHeightPercentage = screenHeight * 0.22f
+    val middleHeightPercentage = screenHeight * 0.47f
+    val bottomHeightPercentage = screenHeight * 0.31f
+
+    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
+
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(topHeightPercentage)
+                    .background(
+                        color = Color.Black
+                    ),
+            )
             CameraPreview(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                onImageCaptured = { photoUri = it }
+                    .height(middleHeightPercentage),
+                onImageCaptured = { photoUri = it },
+                onImageCaptureReady = { capture ->
+                    imageCapture = capture
+                }
             )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(bottomHeightPercentage)
+                    .background(
+                        color = Color.Black
+                    ),
+            ) {
+                Row (
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    IconButton(
+                        modifier = Modifier.size(44.dp),
+                        onClick = {
+                            onBack()
+                        }
+                    ) {
+                        Image(
+                            modifier = Modifier.size(44.dp),
+                            painter = painterResource(id = R.drawable.camera_back),
+                            contentDescription = "back",
+                        )
+                    }
+                    IconButton(
+                        modifier = Modifier.size(72.dp),
+                        onClick = {
+                            imageCapture?.let { capture ->
+                                val photoFile = File(
+                                    context.externalCacheDir,
+                                    "IMG_${System.currentTimeMillis()}.jpg"
+                                )
+                                val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-            Spacer(modifier = Modifier.height(16.dp))
+                                capture.takePicture(
+                                    outputOptions,
+                                    ContextCompat.getMainExecutor(context),
+                                    object : ImageCapture.OnImageSavedCallback {
+                                        override fun onError(exception: ImageCaptureException) {
+                                            Toast.makeText(context, "写真の保存に失敗しました", Toast.LENGTH_SHORT).show()
+                                        }
 
-            Button(onClick = onBack) {
-                Text("戻る")
+                                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                                            Toast.makeText(context, "写真を保存しました: ${photoFile.absolutePath}", Toast.LENGTH_SHORT).show()
+                                            photoUri = photoFile.absolutePath
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    ) {
+                        Image(
+                            modifier = Modifier.size(72.dp),
+                            painter = painterResource(id = R.drawable.camera_shutter),
+                            contentDescription = "shutter",
+                        )
+                    }
+                    IconButton(
+                        modifier = Modifier.size(44.dp),
+                        onClick = {
+                            // TODO カメラ反転　多分要らない？
+                        }
+                    ) {
+                        Image(
+                            modifier = Modifier.size(44.dp),
+                            painter = painterResource(id = R.drawable.camera_reverse),
+                            contentDescription = "reverse",
+                        )
+                    }
+                }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             photoUri?.let {
                 Image(
@@ -101,7 +190,8 @@ fun CameraScreen(
 @Composable
 fun CameraPreview(
     modifier: Modifier = Modifier,
-    onImageCaptured: (String) -> Unit
+    onImageCaptured: (String) -> Unit,
+    onImageCaptureReady: (ImageCapture) -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -127,28 +217,8 @@ fun CameraPreview(
                 cameraProvider.bindToLifecycle(
                     lifecycleOwner, cameraSelector, preview, imageCapture
                 )
-                val photoFile = File(
-                    context.externalCacheDir,
-                    "IMG_${System.currentTimeMillis()}.jpg"
-                )
 
-                val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
-
-                imageCapture?.takePicture(
-                    outputOptions,
-                    ContextCompat.getMainExecutor(context),
-                    object : ImageCapture.OnImageSavedCallback {
-                        override fun onError(exception: ImageCaptureException) {
-                            Toast.makeText(context, "写真の保存に失敗しました", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                            Toast.makeText(context, "写真を保存しました: ${photoFile.absolutePath}", Toast.LENGTH_SHORT).show()
-                            onImageCaptured(photoFile.absolutePath)
-                        }
-                    }
-                )
+                onImageCaptureReady(imageCapture)
 
             } catch (exc: Exception) {
                 Toast.makeText(context, "カメラの初期化に失敗しました", Toast.LENGTH_SHORT).show()
