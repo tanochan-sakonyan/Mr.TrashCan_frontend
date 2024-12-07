@@ -47,7 +47,7 @@ fun CameraScreen(
     val context = LocalContext.current
     var photoUri by remember { mutableStateOf<String?>(null) }
     var hasCameraPermission by remember {
-        mutableStateOf (
+        mutableStateOf(
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.CAMERA
@@ -64,7 +64,7 @@ fun CameraScreen(
     }
 
     LaunchedEffect(hasCameraPermission) {
-        if(!hasCameraPermission) {
+        if (!hasCameraPermission) {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
@@ -91,7 +91,11 @@ fun CameraScreen(
                     .fillMaxWidth()
                     .height(topHeightPercentage)
                     .background(
-                        color = Color.Black
+                        if (isPhotoCaptured) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
                     ),
             )
             Box(
@@ -124,46 +128,75 @@ fun CameraScreen(
                     .fillMaxWidth()
                     .height(bottomHeightPercentage)
                     .background(
-                        color = Color.Black
+                        if (isPhotoCaptured) {
+                            Color.White
+                        } else {
+                            Color.Black
+                        }
                     ),
             ) {
-                Row (
+                Row(
                     modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     IconButton(
                         modifier = Modifier.size(44.dp),
                         onClick = {
+                            if (isPhotoCaptured) {
+                                isPhotoCaptured = false
+                                photoUri = null
+                            } else
                             onBack()
                         }
                     ) {
-                        Image(
-                            modifier = Modifier.size(44.dp),
-                            painter = painterResource(id = R.drawable.camera_back),
-                            contentDescription = "back",
-                        )
+                        if (isPhotoCaptured) {
+                            Image(
+                                modifier = Modifier.size(50.dp),
+                                painter = painterResource(id = R.drawable.camera_back_after_pictured),
+                                contentDescription = "back",
+                            )
+                        } else {
+
+                            Image(
+                                modifier = Modifier.size(72.dp),
+                                painter = painterResource(id = R.drawable.camera_back),
+                                contentDescription = "back",
+                            )
+                        }
                     }
                     IconButton(
                         modifier = Modifier.size(72.dp),
                         onClick = {
+                            if (isPhotoCaptured) {
+                                onBack()
+                            } else
                             imageCapture?.let { capture ->
                                 val photoFile = File(
                                     context.externalCacheDir,
                                     "IMG_${System.currentTimeMillis()}.jpg"
                                 )
-                                val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+                                val outputOptions =
+                                    ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
                                 capture.takePicture(
                                     outputOptions,
                                     ContextCompat.getMainExecutor(context),
                                     object : ImageCapture.OnImageSavedCallback {
                                         override fun onError(exception: ImageCaptureException) {
-                                            Toast.makeText(context, "写真の保存に失敗しました", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                "写真の保存に失敗しました",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
 
                                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                            Toast.makeText(context, "写真を保存しました: ${photoFile.absolutePath}", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                "写真を保存しました: ${photoFile.absolutePath}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                             photoUri = photoFile.absolutePath
                                             isPhotoCaptured = true
                                         }
@@ -172,11 +205,18 @@ fun CameraScreen(
                             }
                         }
                     ) {
-                        Image(
-                            modifier = Modifier.size(72.dp),
-                            painter = painterResource(id = R.drawable.camera_shutter),
-                            contentDescription = "shutter",
-                        )
+                        if (isPhotoCaptured) {
+                            Image(
+                                modifier = Modifier.size(72.dp),
+                                painter = painterResource(id = R.drawable.camera_check),
+                                contentDescription = "camera_shutter",
+                            )
+                        } else
+                            Image(
+                                modifier = Modifier.size(72.dp),
+                                painter = painterResource(id = R.drawable.camera_shutter),
+                                contentDescription = "camera_check",
+                            )
                     }
                     IconButton(
                         modifier = Modifier.size(44.dp),
