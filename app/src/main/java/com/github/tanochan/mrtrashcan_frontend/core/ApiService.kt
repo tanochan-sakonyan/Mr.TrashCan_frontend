@@ -10,14 +10,14 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-    @GET("example.com/trashcan")
+    @GET("/trashcan")
     suspend fun getTrashCanList(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
     ): List<TrashCan>
 
     @Multipart
-    @POST("example.com/trashcan")
+    @POST("/trashcan")
     suspend fun registerTrashCan(
         @Part("latitude") latitude: Double,
         @Part("longitude") longitude: Double,

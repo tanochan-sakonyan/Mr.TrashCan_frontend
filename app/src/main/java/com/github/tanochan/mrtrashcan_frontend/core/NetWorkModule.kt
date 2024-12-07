@@ -15,7 +15,7 @@ object NetWorkModule {
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://example.com/api")
+            .baseUrl("https://example.com/api") //TODO 実際のbaseUrlに置き換える
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
