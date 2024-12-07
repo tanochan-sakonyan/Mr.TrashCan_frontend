@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -108,8 +109,18 @@ fun RegisterScreen(
                                 height = 36.dp,
                             )
                             .clip(shape = RoundedCornerShape(35.dp))
-                            .background(Color.Green)
-                            .clickable { onBack() },
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF75FF8C),
+                                        Color(0xFF4FBBA9)
+                                    )
+                                )
+                            )
+                            .clickable {
+                                // TODO ゴミ箱登録処理
+                                onBack()
+                            },
                     ) {
                         Text(
                             modifier = Modifier.align(Alignment.Center),
