@@ -72,12 +72,14 @@ fun CameraScreen(
     if (!hasCameraPermission) return
 
     val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp // 画面の高さをdpで取得
+    val screenHeight = configuration.screenHeightDp.dp
     val topHeightPercentage = screenHeight * 0.22f
     val middleHeightPercentage = screenHeight * 0.47f
     val bottomHeightPercentage = screenHeight * 0.31f
 
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
+
+    var isPhotoCaptured by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -92,15 +94,31 @@ fun CameraScreen(
                         color = Color.Black
                     ),
             )
-            CameraPreview(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(middleHeightPercentage),
-                onImageCaptured = { photoUri = it },
-                onImageCaptureReady = { capture ->
-                    imageCapture = capture
+                    .height(middleHeightPercentage)
+            ) {
+                // TODO もしかしたらnullチェック不要かも
+                if (isPhotoCaptured && photoUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(photoUri),
+                        contentDescription = "Captured photo",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    CameraPreview(
+                        modifier = Modifier.fillMaxSize(),
+                        onImageCaptured = { uri ->
+                            // ここは今回利用しなくてもよいが、onImageCapturedが呼ばれた場合はURIを更新可能
+                            photoUri = uri
+                        },
+                        onImageCaptureReady = { capture ->
+                            imageCapture = capture
+                        }
+                    )
                 }
-            )
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -147,6 +165,7 @@ fun CameraScreen(
                                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                                             Toast.makeText(context, "写真を保存しました: ${photoFile.absolutePath}", Toast.LENGTH_SHORT).show()
                                             photoUri = photoFile.absolutePath
+                                            isPhotoCaptured = true
                                         }
                                     }
                                 )
@@ -172,16 +191,6 @@ fun CameraScreen(
                         )
                     }
                 }
-            }
-
-            photoUri?.let {
-                Image(
-                    painter = rememberAsyncImagePainter(it),
-                    contentDescription = "Captured photo",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(8.dp)
-                )
             }
         }
     }
