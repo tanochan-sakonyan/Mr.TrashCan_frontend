@@ -8,8 +8,8 @@ import androidx.camera.core.ImageCapture
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.github.tanochan.mrtrashcan_frontend.feature.map.MapScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.camera.CameraScreenHost
-import com.github.tanochan.mrtrashcan_frontend.feature.map.mapScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.register.RegisterScreenHost
 import com.github.tanochan.mrtrashcan_frontend.feature.screens
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,13 +30,13 @@ class MainActivity : ComponentActivity() {
                 startDestination = "Map",
             ){
                 composable(screens.Map.route){
-                    mapScreenHost(
+                    MapScreenHost(
                         navigateToRegister = {
                             navController.navigate(screens.Register.route)
                         }
                     )
                 }
-                composable(screens.Register.route) {
+                composable(screens.Register.route){
                     RegisterScreenHost(
                         navigateToMap = {
                             navController.popBackStack()

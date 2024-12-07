@@ -20,6 +20,11 @@ retrofit = "2.9.0"
 converter-gson = "2.9.0"
 google-maps-compose = "2.11.1"
 play-services-maps = "18.1.0"
+play-services-location = "21.0.1"
+lifecycle-viewmodel = "2.6.1"
+kotlinx-coroutines = "1.7.1"
+accompanist-permissions = "0.36.0"
+coroutines-play-services = "1.7.1"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraxVersion" }
@@ -54,7 +59,11 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converter-gson"}
 google-maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "google-maps-compose" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "play-services-maps" }
-
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location" }
+lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle-viewmodel" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist-permissions" }
+coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines-play-services" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

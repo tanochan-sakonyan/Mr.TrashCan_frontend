@@ -1,11 +1,16 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.map
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -14,16 +19,27 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.tanochan.mrtrashcan_frontend.R
+import com.github.tanochan.mrtrashcan_frontend.feature.RequestLocationPermission
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -31,28 +47,28 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
+
 @Composable
-fun mapScreenHost(
-    navigateToRegister: () -> Unit
+fun MapScreenHost(
+    navigateToRegister: () -> Unit,
+    mapViewModel: MapViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 ){
-    mapScreen(
-        onFabClick = navigateToRegister
+    MapScreen(
+        onFabClick = navigateToRegister,
+        mapViewModel = mapViewModel
     )
 }
 
 @Composable
-fun mapScreen(
-        onFabClick: () -> Unit
+fun MapScreen(
+        onFabClick: () -> Unit,
+        mapViewModel: MapViewModel
 ){
+    val currentLocation by mapViewModel.currentLocation.collectAsState()
+
     Box(modifier = Modifier.fillMaxSize()){
-        //TODO: ここにバックから取得した現在地を入力
-        // カメラの初期位置を設定（例: 東京駅）
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(
-                LatLng(35.681236, 139.767125), // 東京駅の座標
-                15f // ズームレベル
-            )
-        }
+        // カメラの初期位置を(0, 0)に設定
+        val cameraPositionState = rememberCameraPositionState()
 
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -63,18 +79,44 @@ fun mapScreen(
             val trashCanLocations = listOf(
                 LatLng(35.681236, 139.767125), // 東京駅
                 LatLng(35.6895, 139.6917)      // 新宿駅
-                // 必要に応じて追加
             )
 
-            // 各ゴミ箱にマーカーを追加
+            // 各ゴミ箱にマーカー（ピン）を立てる
             trashCanLocations.forEach { location ->
                 Marker(
                     state = MarkerState(position = location),
                     title = "ゴミ箱",
-                    snippet = "ここにゴミ箱があります"
-                    // 必要に応じてカスタムアイコンを設定
-                    // icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                    snippet = "ここにゴミ箱があります",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
                 )
+            }
+
+            //自身の現在地にマーカーをつける
+            currentLocation?.let { location ->
+                Marker(
+                    state = MarkerState(position = location),
+                    title = "現在地",
+                    snippet = "あなたの現在地",
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_current_location)
+                )
+            }
+        }
+
+        // 現在地取得の権限を要求
+        RequestLocationPermission (
+            onPermissionGranted = {
+                mapViewModel.fetchCurrentLocation()
+            },
+            //拒否されたら東京駅をデフォルトの現在地に設定
+            onPermissionDenied = {
+                mapViewModel.setDefaultLocation(LatLng(35.681236, 139.767125)) // 東京駅の座標
+            }
+        )
+
+        // 現在地が更新されたらカメラを移動
+        currentLocation?.let { location ->
+            LaunchedEffect(location) {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(location, 15f))
             }
         }
 
@@ -89,6 +131,7 @@ fun mapScreen(
             Icon(
                 painter = painterResource(id = R.drawable.search),
                 contentDescription = "Search",
+                modifier = Modifier.size(36.dp),
                 tint = Color.Green
             )
         }
@@ -104,6 +147,7 @@ fun mapScreen(
             Icon(
                 painter = painterResource(id = R.drawable.settings),
                 contentDescription = "Setting",
+                modifier = Modifier.size(36.dp),
                 tint = Color.Green
             )
         }
@@ -112,13 +156,14 @@ fun mapScreen(
             onClick = {},
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(bottom = 84.dp, start = 24.dp),
+                .padding(bottom = 120.dp, start = 24.dp),
             shape = CircleShape,
             containerColor = Color.White
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.filter_alt),
                 contentDescription = "Filter",
+                modifier = Modifier.size(36.dp),
                 tint = Color.Green
             )
         }
@@ -127,14 +172,16 @@ fun mapScreen(
             onClick = {},
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 84.dp, end = 24.dp),
+                .padding(bottom = 120.dp, end = 24.dp)
+                .size(72.dp),
             shape = CircleShape,
             containerColor = Color.White
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.near_me),
                 contentDescription = "Near Me",
-                tint = Color.Green
+                modifier = Modifier.size(42.dp),
+                tint = Color.Green,
             )
         }
 
@@ -143,7 +190,7 @@ fun mapScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 32.dp)
-                .width(240.dp),
+                .width(280.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Green,)
         ) {
@@ -168,10 +215,4 @@ fun mapScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun mapScreenPreview(){
-    mapScreen(onFabClick = {})
 }
