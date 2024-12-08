@@ -1,5 +1,6 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.map
 
+import BottomSheetContent
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -20,9 +21,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -74,6 +78,7 @@ fun loadMapStyle(context: Context, rawResourceId: Int): MapStyleOptions? {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreenHost(
     navigateToRegister: () -> Unit,
@@ -85,6 +90,7 @@ fun MapScreenHost(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
         onFabClick: () -> Unit,
@@ -93,6 +99,14 @@ fun MapScreen(
     val context = LocalContext.current
     val currentLocation by mapViewModel.currentLocation.collectAsState()
 
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    Box(modifier = Modifier.fillMaxSize()){
+        // カメラの初期位置を(0, 0)に設定
+    val cameraPositionState = rememberCameraPositionState()
     val mapStyleOptions = remember {
         loadMapStyle(context, R.raw.map_design)
     }
@@ -130,7 +144,12 @@ fun MapScreen(
                     state = MarkerState(position = location),
                     title = "ゴミ箱",
                     snippet = "ここにゴミ箱があります",
+
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.pin)
+                    onClick = {
+                        showBottomSheet = true
+                        false
+                    }
                 )
             }
 
@@ -242,4 +261,16 @@ fun MapScreen(
                 .padding(bottom = 32.dp)
         )
     }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            BottomSheetContent()
+        }
+    }
+
 }
