@@ -1,5 +1,6 @@
 package com.github.tanochan.mrtrashcan_frontend.ui
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,16 +32,23 @@ fun FilterFab(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val height by animateDpAsState(targetValue = if (expanded) 360.dp else 56.dp)
 
     Surface(
         modifier = if (expanded) {
             modifier
                 .width(56.dp)
-                .height(320.dp)
+                .height(height)
+                .padding(top = 12.dp, bottom = 12.dp)
         } else {
             modifier.size(56.dp)
         },
-        shape = if (expanded) RoundedCornerShape(16.dp) else CircleShape,
+        shape = if (expanded) RoundedCornerShape(
+            topStart = 28.dp,
+            topEnd = 28.dp,
+            bottomStart = 28.dp,
+            bottomEnd = 28.dp
+        ) else CircleShape,
         color = Color.White,
         shadowElevation = 8.dp
     ) {
@@ -78,7 +86,7 @@ fun FilterFab(
                 FilterIcon(
                     iconResId = R.drawable.filter,
                     description = "フィルター",
-                    onClick = { onFilterSelected("filter") }
+                    onClick = { expanded = !expanded }
                 )
             }
         } else {
