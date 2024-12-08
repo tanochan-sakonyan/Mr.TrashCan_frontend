@@ -1,5 +1,6 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.map
 
+import BottomSheetContent
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,14 +18,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -52,6 +58,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreenHost(
     navigateToRegister: () -> Unit,
@@ -63,12 +70,19 @@ fun MapScreenHost(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
         onFabClick: () -> Unit,
         mapViewModel: MapViewModel
 ){
     val currentLocation by mapViewModel.currentLocation.collectAsState()
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
 
     Box(modifier = Modifier.fillMaxSize()){
         // カメラの初期位置を(0, 0)に設定
@@ -91,7 +105,11 @@ fun MapScreen(
                     state = MarkerState(position = location),
                     title = "ゴミ箱",
                     snippet = "ここにゴミ箱があります",
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN),
+                    onClick = {
+                        showBottomSheet = true
+                        false
+                    }
                 )
             }
 
@@ -203,4 +221,16 @@ fun MapScreen(
                 .padding(bottom = 32.dp)
         )
     }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            BottomSheetContent()
+        }
+    }
+
 }
