@@ -48,7 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.github.tanochan.mrtrashcan_frontend.R
-import com.github.tanochan.mrtrashcan_frontend.feature.register.component.CustomElevatedButton
+import com.github.tanochan.mrtrashcan_frontend.ui.component.CustomElevatedButton
 import com.google.android.gms.maps.model.LatLng
 
 @Composable
