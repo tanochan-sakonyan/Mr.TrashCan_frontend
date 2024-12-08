@@ -192,9 +192,6 @@ fun MapScreen(
                     mapViewModel.saveCurrentLocation(location)
                     onFabClick()
                 }
-
-                //デバッグ用、後で消す
-                Log.d("map","current_location_is:{${currentLocation!!.latitude},${currentLocation!!.longitude}}")
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)

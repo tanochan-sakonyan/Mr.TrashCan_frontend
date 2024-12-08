@@ -125,8 +125,6 @@ fun RegisterScreen(
                             .background(Color.Green)
                             .clickable {
                                 onBack();
-                                //デバッグ用、後で消す
-                                Log.d("map","current_location_is:{${currentLocation?.latitude},${currentLocation?.longitude}}")
                             },
                     ) {
                         Text(
@@ -151,12 +149,6 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-
-            //TODO 消して
-            //絶対消す、デバッグ用
-            currentLocation?.let {
-                Text(text = "現在地: ${it.latitude}, ${it.longitude}")
-            }
 
             Row(
                 modifier = Modifier.align(Alignment.Start)
