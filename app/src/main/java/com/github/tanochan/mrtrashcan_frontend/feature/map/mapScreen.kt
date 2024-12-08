@@ -94,12 +94,12 @@ fun MapScreen(
     val currentLocation by mapViewModel.currentLocation.collectAsState()
 
     val mapStyleOptions = remember {
-        loadMapStyle(context, R.raw.map_design) // map_design.json を読み込む
+        loadMapStyle(context, R.raw.map_design)
     }
 
     val defaultCameraPosition = LatLng(0.0, 0.0)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultCameraPosition, 2f) // 初期ズームレベルを設定
+        position = CameraPosition.fromLatLngZoom(defaultCameraPosition, 2f)
     }
 
     var hasLocationPermission by remember { mutableStateOf(false) }
@@ -109,12 +109,12 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             uiSettings = MapUiSettings(
-                myLocationButtonEnabled = hasLocationPermission // 権限がある場合のみボタンを有効化
+                myLocationButtonEnabled = hasLocationPermission
             ),
             properties = MapProperties(
-                mapStyleOptions = mapStyleOptions, // カスタムスタイルを適用
+                mapStyleOptions = mapStyleOptions,
                 isMyLocationEnabled = hasLocationPermission, // 現在地表示を有効化
-                isTrafficEnabled = false, // 必要に応じて他のプロパティも設定
+                isTrafficEnabled = false,
             )
         ) {
             //TODO: ここにバックから取得したゴミ箱リストを入力
