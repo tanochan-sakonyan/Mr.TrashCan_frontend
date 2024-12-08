@@ -28,13 +28,52 @@ class RegisterViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager,
 ): ViewModel() {
 
+    var isBurningSelected: MutableState<Boolean> = mutableStateOf(false)
+    var isUnBurningSelected: MutableState<Boolean> = mutableStateOf(false)
+    var isCanSelected: MutableState<Boolean> = mutableStateOf(false)
+    var isBottleSelected: MutableState<Boolean> = mutableStateOf(false)
+    var isPetBottleSelected: MutableState<Boolean> = mutableStateOf(false)
+
+    var landmark: MutableState<String> = mutableStateOf("")
+
+    var selectedButton: MutableState<String> = mutableStateOf("")
+
     var photoUri: MutableState<String?> = mutableStateOf(savedStateHandle["photoUri"])
         private set
 
+    var note: MutableState<String> = mutableStateOf("")
+
+    fun toggleBurning() {
+        isBurningSelected.value = !isBurningSelected.value
+    }
+    fun toggleUnBurning() {
+        isUnBurningSelected.value = !isUnBurningSelected.value
+    }
+    fun toggleCan() {
+        isCanSelected.value = !isCanSelected.value
+    }
+    fun toggleBottle() {
+        isBottleSelected.value = !isBottleSelected.value
+    }
+    fun togglePetBottle() {
+        isPetBottleSelected.value = !isPetBottleSelected.value
+    }
+
+    fun updateLandmark(newLandmark: String) {
+        landmark.value = newLandmark
+    }
+
+    fun updateSelectedButton(newButton: String) {
+        selectedButton.value = newButton
+    }
+
     fun updatePhotoUri(uri: String) {
-        Log.d("RegisterViewModel", "Updating photo URI to: $uri")
         photoUri.value = uri
         savedStateHandle["photoUri"] = uri
+    }
+
+    fun updateNote(newNote: String) {
+        note.value = newNote
     }
 
     private val _currentLocation = MutableStateFlow<LatLng?>(null)

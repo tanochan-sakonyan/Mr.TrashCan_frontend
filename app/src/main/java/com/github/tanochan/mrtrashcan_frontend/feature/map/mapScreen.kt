@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -38,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.feature.RequestLocationPermission
+import com.github.tanochan.mrtrashcan_frontend.ui.ClickableBox
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -186,39 +189,18 @@ fun MapScreen(
             )
         }
 
-        Button(
+        ClickableBox(
             onClick = {
                 currentLocation?.let { location ->
                     mapViewModel.saveCurrentLocation(location)
                     onFabClick()
                 }
             },
+            text = "ごみ箱を報告",
+            iconPainter = painterResource(id = R.drawable.delete),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 32.dp)
-                .width(280.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Green,)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.delete),
-                    contentDescription = "trashcan",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "ごみ箱を報告",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    color = Color.White
-                )
-            }
-        }
+        )
     }
 }
