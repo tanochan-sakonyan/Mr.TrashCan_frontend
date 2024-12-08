@@ -1,11 +1,14 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.map
 
 import BottomSheetContent
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.tanochan.mrtrashcan_frontend.R
@@ -52,11 +56,27 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
+fun loadMapStyle(context: Context, rawResourceId: Int): MapStyleOptions? {
+    return try {
+        val inputStream = context.resources.openRawResource(rawResourceId)
+        val json = BufferedReader(InputStreamReader(inputStream)).use { it.readText() }
+        MapStyleOptions(json)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +96,7 @@ fun MapScreen(
         onFabClick: () -> Unit,
         mapViewModel: MapViewModel
 ){
+    val context = LocalContext.current
     val currentLocation by mapViewModel.currentLocation.collectAsState()
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -83,14 +104,32 @@ fun MapScreen(
         skipPartiallyExpanded = true
     )
 
-
     Box(modifier = Modifier.fillMaxSize()){
         // カメラの初期位置を(0, 0)に設定
-        val cameraPositionState = rememberCameraPositionState()
+    val cameraPositionState = rememberCameraPositionState()
+    val mapStyleOptions = remember {
+        loadMapStyle(context, R.raw.map_design)
+    }
 
+    val defaultCameraPosition = LatLng(0.0, 0.0)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(defaultCameraPosition, 2f)
+    }
+
+    var hasLocationPermission by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()){
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(
+                myLocationButtonEnabled = hasLocationPermission
+            ),
+            properties = MapProperties(
+                mapStyleOptions = mapStyleOptions,
+                isMyLocationEnabled = hasLocationPermission, // 現在地表示を有効化
+                isTrafficEnabled = false,
+            )
         ) {
             //TODO: ここにバックから取得したゴミ箱リストを入力
             // ゴミ箱の座標リスト（ここに実際のデータを追加）
@@ -105,7 +144,8 @@ fun MapScreen(
                     state = MarkerState(position = location),
                     title = "ゴミ箱",
                     snippet = "ここにゴミ箱があります",
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN),
+
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.pin)
                     onClick = {
                         showBottomSheet = true
                         false
@@ -113,24 +153,28 @@ fun MapScreen(
                 )
             }
 
-            //自身の現在地にマーカーをつける
-            currentLocation?.let { location ->
-                Marker(
-                    state = MarkerState(position = location),
-                    title = "現在地",
-                    snippet = "あなたの現在地",
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_current_location)
-                )
+            if (hasLocationPermission &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            ) {
+                MapEffect { map ->
+                    try {
+                        map.isMyLocationEnabled = true
+                    } catch (e: SecurityException) {
+                        Log.e("MapEffect", "Permission denied to access location")
+                    }
+                }
             }
         }
 
         // 現在地取得の権限を要求
         RequestLocationPermission (
             onPermissionGranted = {
+                hasLocationPermission = true
                 mapViewModel.fetchCurrentLocation()
             },
             //拒否されたら東京駅をデフォルトの現在地に設定
             onPermissionDenied = {
+                hasLocationPermission = false
                 mapViewModel.setDefaultLocation(LatLng(35.681236, 139.767125)) // 東京駅の座標
             }
         )
@@ -150,11 +194,10 @@ fun MapScreen(
             shape = CircleShape,
             containerColor = Color.White
         ) {
-            Icon(
+            Image(
                 painter = painterResource(id = R.drawable.search),
                 contentDescription = "Search",
-                modifier = Modifier.size(36.dp),
-                tint = Color.Green
+                modifier = Modifier.size(28.dp),
             )
         }
 
@@ -166,11 +209,10 @@ fun MapScreen(
             shape = CircleShape,
             containerColor = Color.White
         ) {
-            Icon(
+            Image(
                 painter = painterResource(id = R.drawable.settings),
                 contentDescription = "Setting",
                 modifier = Modifier.size(36.dp),
-                tint = Color.Green
             )
         }
 
@@ -182,11 +224,10 @@ fun MapScreen(
             shape = CircleShape,
             containerColor = Color.White
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.filter_alt),
+            Image(
+                painter = painterResource(id = R.drawable.filter),
                 contentDescription = "Filter",
-                modifier = Modifier.size(36.dp),
-                tint = Color.Green
+                modifier = Modifier.size(28.dp),
             )
         }
 
@@ -199,11 +240,10 @@ fun MapScreen(
             shape = CircleShape,
             containerColor = Color.White
         ) {
-            Icon(
+            Image(
                 painter = painterResource(id = R.drawable.near_me),
                 contentDescription = "Near Me",
-                modifier = Modifier.size(42.dp),
-                tint = Color.Green,
+                modifier = Modifier.size(36.dp),
             )
         }
 
