@@ -1,4 +1,4 @@
-package com.github.tanochan.mrtrashcan_frontend.feature.register.component
+package com.github.tanochan.mrtrashcan_frontend.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

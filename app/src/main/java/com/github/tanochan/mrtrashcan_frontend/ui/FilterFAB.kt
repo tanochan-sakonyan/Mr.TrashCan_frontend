@@ -117,7 +117,7 @@ fun FilterIcon(
         painter = painterResource(id = iconResId),
         contentDescription = description,
         modifier = Modifier
-            .size(48.dp)
+            .size(42.dp)
             .clickable { onClick() }
     )
 }

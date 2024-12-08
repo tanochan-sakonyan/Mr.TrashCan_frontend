@@ -1,5 +1,6 @@
 package com.github.tanochan.mrtrashcan_frontend.feature.map
 
+import BottomSheetContent
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -18,11 +19,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -86,117 +86,133 @@ fun MapScreenHost(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
         onFabClick: () -> Unit,
         mapViewModel: MapViewModel
-){
+) {
     val context = LocalContext.current
     val currentLocation by mapViewModel.currentLocation.collectAsState()
 
-    val mapStyleOptions = remember {
-        loadMapStyle(context, R.raw.map_design)
-    }
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
-    val defaultCameraPosition = LatLng(0.0, 0.0)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultCameraPosition, 2f)
-    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // カメラの初期位置を(0, 0)に設定
+        val mapStyleOptions = remember {
+            loadMapStyle(context, R.raw.map_design)
+        }
 
-    var hasLocationPermission by remember { mutableStateOf(false) }
+        val defaultCameraPosition = LatLng(0.0, 0.0)
+        val cameraPositionState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(defaultCameraPosition, 2f)
+        }
 
-    Box(modifier = Modifier.fillMaxSize()){
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(
-                myLocationButtonEnabled = hasLocationPermission
-            ),
-            properties = MapProperties(
-                mapStyleOptions = mapStyleOptions,
-                isMyLocationEnabled = hasLocationPermission, // 現在地表示を有効化
-                isTrafficEnabled = false,
-            )
-        ) {
-            //TODO: ここにバックから取得したゴミ箱リストを入力
-            // ゴミ箱の座標リスト（ここに実際のデータを追加）
-            val trashCanLocations = listOf(
-                LatLng(35.681236, 139.767125), // 東京駅
-                LatLng(35.6895, 139.6917)      // 新宿駅
-            )
+        var hasLocationPermission by remember { mutableStateOf(false) }
 
-            // 各ゴミ箱にマーカー（ピン）を立てる
-            trashCanLocations.forEach { location ->
-                Marker(
-                    state = MarkerState(position = location),
-                    title = "ゴミ箱",
-                    snippet = "ここにゴミ箱があります",
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.pin)
+        Box(modifier = Modifier.fillMaxSize()) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(
+                    myLocationButtonEnabled = hasLocationPermission
+                ),
+                properties = MapProperties(
+                    mapStyleOptions = mapStyleOptions,
+                    isMyLocationEnabled = hasLocationPermission, // 現在地表示を有効化
+                    isTrafficEnabled = false,
                 )
-            }
-
-            if (hasLocationPermission &&
-                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
             ) {
-                MapEffect { map ->
-                    try {
-                        map.isMyLocationEnabled = true
-                    } catch (e: SecurityException) {
-                        Log.e("MapEffect", "Permission denied to access location")
+                //TODO: ここにバックから取得したゴミ箱リストを入力
+                // ゴミ箱の座標リスト（ここに実際のデータを追加）
+                val trashCanLocations = listOf(
+                    LatLng(35.681236, 139.767125), // 東京駅
+                    LatLng(35.6895, 139.6917)      // 新宿駅
+                )
+
+                // 各ゴミ箱にマーカー（ピン）を立てる
+                trashCanLocations.forEach { location ->
+                    Marker(
+                        state = MarkerState(position = location),
+                        title = "ゴミ箱",
+                        snippet = "ここにゴミ箱があります",
+
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.pin),
+                        onClick = {
+                            showBottomSheet = true
+                            false
+                        }
+                    )
+                }
+
+                if (hasLocationPermission &&
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    MapEffect { map ->
+                        try {
+                            map.isMyLocationEnabled = true
+                        } catch (e: SecurityException) {
+                            Log.e("MapEffect", "Permission denied to access location")
+                        }
                     }
                 }
             }
-        }
 
-        // 現在地取得の権限を要求
-        RequestLocationPermission (
-            onPermissionGranted = {
-                hasLocationPermission = true
-                mapViewModel.fetchCurrentLocation()
-            },
-            //拒否されたら東京駅をデフォルトの現在地に設定
-            onPermissionDenied = {
-                hasLocationPermission = false
-                mapViewModel.setDefaultLocation(LatLng(35.681236, 139.767125)) // 東京駅の座標
-            }
-        )
-
-        // 現在地が更新されたらカメラを移動
-        currentLocation?.let { location ->
-            LaunchedEffect(location) {
-                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(location, 15f))
-            }
-        }
-
-        FloatingActionButton(
-            onClick = {},
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 56.dp, start = 24.dp),
-            shape = CircleShape,
-            containerColor = Color.White
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.search),
-                contentDescription = "Search",
-                modifier = Modifier.size(28.dp),
+            // 現在地取得の権限を要求
+            RequestLocationPermission(
+                onPermissionGranted = {
+                    hasLocationPermission = true
+                    mapViewModel.fetchCurrentLocation()
+                },
+                //拒否されたら東京駅をデフォルトの現在地に設定
+                onPermissionDenied = {
+                    hasLocationPermission = false
+                    mapViewModel.setDefaultLocation(LatLng(35.681236, 139.767125)) // 東京駅の座標
+                }
             )
-        }
 
-        FloatingActionButton(
-            onClick = {},
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 56.dp, end = 24.dp),
-            shape = CircleShape,
-            containerColor = Color.White
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.settings),
-                contentDescription = "Setting",
-                modifier = Modifier.size(36.dp),
-            )
-        }
+            // 現在地が更新されたらカメラを移動
+            currentLocation?.let { location ->
+                LaunchedEffect(location) {
+                    cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(location, 15f))
+                }
+            }
+
+            FloatingActionButton(
+                onClick = {},
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 56.dp, start = 24.dp),
+                shape = CircleShape,
+                containerColor = Color.White
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.search),
+                    contentDescription = "Search",
+                    modifier = Modifier.size(28.dp),
+                )
+            }
+
+            FloatingActionButton(
+                onClick = {},
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 56.dp, end = 24.dp),
+                shape = CircleShape,
+                containerColor = Color.White
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.settings),
+                    contentDescription = "Setting",
+                    modifier = Modifier.size(36.dp),
+                )
+            }
 
         FilterFab(
             onFilterSelected = { filterType ->
@@ -209,34 +225,47 @@ fun MapScreen(
                 .padding(bottom = 120.dp, start = 24.dp),
         )
 
-        FloatingActionButton(
-            onClick = {},
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 120.dp, end = 24.dp)
-                .size(72.dp),
-            shape = CircleShape,
-            containerColor = Color.White
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.near_me),
-                contentDescription = "Near Me",
-                modifier = Modifier.size(36.dp),
+            FloatingActionButton(
+                onClick = {},
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 120.dp, end = 24.dp)
+                    .size(72.dp),
+                shape = CircleShape,
+                containerColor = Color.White
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.near_me),
+                    contentDescription = "Near Me",
+                    modifier = Modifier.size(36.dp),
+                )
+            }
+
+            ClickableBox(
+                onClick = {
+                    currentLocation?.let { location ->
+                        mapViewModel.saveCurrentLocation(location)
+                        onFabClick()
+                    }
+                },
+                text = "ごみ箱を報告",
+                iconPainter = painterResource(id = R.drawable.delete),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp)
             )
         }
 
-        ClickableBox(
-            onClick = {
-                currentLocation?.let { location ->
-                    mapViewModel.saveCurrentLocation(location)
-                    onFabClick()
-                }
-            },
-            text = "ごみ箱を報告",
-            iconPainter = painterResource(id = R.drawable.delete),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 32.dp)
-        )
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+                BottomSheetContent()
+            }
+        }
+
     }
 }
