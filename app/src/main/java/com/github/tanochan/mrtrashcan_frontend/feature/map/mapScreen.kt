@@ -3,6 +3,7 @@ package com.github.tanochan.mrtrashcan_frontend.feature.map
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -184,12 +185,17 @@ fun MapScreen(
                 painter = painterResource(id = R.drawable.near_me),
                 contentDescription = "Near Me",
                 modifier = Modifier.size(42.dp),
-                tint = Color.Green
+                tint = Color.Green,
             )
         }
 
         ClickableBox(
-            onClick = { onFabClick() },
+            onClick = {
+                currentLocation?.let { location ->
+                    mapViewModel.saveCurrentLocation(location)
+                    onFabClick()
+                }
+            },
             text = "ごみ箱を報告",
             iconPainter = painterResource(id = R.drawable.delete),
             modifier = Modifier
