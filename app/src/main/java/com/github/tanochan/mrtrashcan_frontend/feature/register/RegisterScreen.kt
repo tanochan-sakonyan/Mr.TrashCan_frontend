@@ -25,13 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -67,19 +64,25 @@ fun RegisterScreen(
     onCameraClick: () -> Unit,
     viewModel: RegisterViewModel,
 ) {
-    var isBurningSelected by remember { mutableStateOf(false) }
-    var isUnBurningSelected by remember { mutableStateOf(false) }
-    var isCanSelected by remember { mutableStateOf(false) }
-    var isBottleSelected by remember { mutableStateOf(false) }
-    var isPetBottleSelected by remember { mutableStateOf(false) }
+    val isBurningSelected = viewModel.isBurningSelected.value
+    val isUnBurningSelected = viewModel.isUnBurningSelected.value
+    val isCanSelected = viewModel.isCanSelected.value
+    val isBottleSelected = viewModel.isBottleSelected.value
+    val isPetBottleSelected = viewModel.isPetBottleSelected.value
 
-    var landmark by remember { mutableStateOf("") }
+    val landmark = viewModel.landmark.value
 
-    var selectedButton by remember { mutableStateOf("") }
+    val selectedButton = viewModel.selectedButton.value
 
     val photoUri = viewModel.photoUri.value
 
-    var note by remember { mutableStateOf("") }
+    val note = viewModel.note.value
+
+    val isPostable = (isBurningSelected || isUnBurningSelected || isCanSelected ||
+            isBottleSelected || isPetBottleSelected) &&
+            landmark.isNotEmpty() &&
+            selectedButton.isNotEmpty() &&
+            photoUri != null
 
     Scaffold(
         topBar = {
@@ -89,7 +92,11 @@ fun RegisterScreen(
                 },
                 navigationIcon = {
                     TextButton(
-                        onClick = onBack, modifier = Modifier.padding(start = 28.dp)
+                        onClick = {
+                            // TODO 内容リセット処理
+                            onBack()
+                        },
+                        modifier = Modifier.padding(start = 28.dp)
                     ) {
                         Text(
                             text = "キャンセル", style = TextStyle(
@@ -108,8 +115,25 @@ fun RegisterScreen(
                                 height = 36.dp,
                             )
                             .clip(shape = RoundedCornerShape(35.dp))
-                            .background(Color.Green)
-                            .clickable { onBack() },
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = if(isPostable) {
+                                        listOf(
+                                            Color(0xFF50BCA3),
+                                            Color(0xFF4FBBA9)
+                                        )
+                                    } else
+                                    listOf(
+                                        Color(0xFF75FF8C).copy(alpha = 0.3f),
+                                        Color(0xFF4FBBA9).copy(alpha = 0.4f)
+                                    )
+                                )
+                            )
+                            .clickable (enabled = isPostable) {
+                                // TODO ゴミ箱登録処理
+                                // TODO 内容リセット処理
+                                onBack()
+                            },
                     ) {
                         Text(
                             modifier = Modifier.align(Alignment.Center),
@@ -163,45 +187,31 @@ fun RegisterScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
 
                 ) {
-                IconButton(
-                    onClick = { isBurningSelected = !isBurningSelected }
-                ) {
+                IconButton(onClick = { viewModel.toggleBurning() }) {
                     Image(
                         painter = painterResource(id = if (isBurningSelected) R.drawable.burning_on else R.drawable.burning_off),
                         contentDescription = "burning",
                     )
                 }
-                IconButton(
-                    onClick = { isUnBurningSelected = !isUnBurningSelected }
-                ) {
+                IconButton(onClick = { viewModel.toggleUnBurning() }) {
                     Image(
                         painter = painterResource(id = if (isUnBurningSelected) R.drawable.unburning_on else R.drawable.unburning_off),
                         contentDescription = "unburning",
                     )
                 }
-                IconButton(
-                    onClick = { isCanSelected = !isCanSelected }
-                ) {
+                IconButton(onClick = { viewModel.toggleCan() }) {
                     Image(
-                        painter = painterResource(
-                            id = if (isCanSelected) R.drawable.can_on else R.drawable.can_off
-                        ),
+                        painter = painterResource(id = if (isCanSelected) R.drawable.can_on else R.drawable.can_off),
                         contentDescription = "can",
                     )
                 }
-                IconButton(
-                    onClick = { isBottleSelected = !isBottleSelected }
-                ) {
+                IconButton(onClick = { viewModel.toggleBottle() }) {
                     Image(
-                        painter = painterResource(
-                            id = if (isBottleSelected) R.drawable.bottle_on else R.drawable.bottle_off
-                        ),
+                        painter = painterResource(id = if (isBottleSelected) R.drawable.bottle_on else R.drawable.bottle_off),
                         contentDescription = "bottle",
                     )
                 }
-                IconButton(
-                    onClick = { isPetBottleSelected = !isPetBottleSelected }
-                ) {
+                IconButton(onClick = { viewModel.togglePetBottle() }) {
                     Image(
                         painter = painterResource(id = if (isPetBottleSelected) R.drawable.pet_bottle_on else R.drawable.pet_bottle_off),
                         contentDescription = "pet_bottle",
@@ -233,9 +243,9 @@ fun RegisterScreen(
             }
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
-                modifier = Modifier.size(width = 314.dp, height = 40.dp),
+                modifier = Modifier.size(width = 314.dp, height = 60.dp),
                 value = landmark,
-                onValueChange = { landmark = it },
+                onValueChange = { viewModel.updateLandmark(it) },
                 label = {
                     Text(
                         "例）XX駅西口、ローソン、○○公園", style = TextStyle(
@@ -286,19 +296,19 @@ fun RegisterScreen(
                 CustomElevatedButton(
                     title = "改札内",
                     isSelected = selectedButton == "insideGate",
-                    onClick = { selectedButton = "insideGate" }
+                    onClick = { viewModel.updateSelectedButton("insideGate") }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 CustomElevatedButton(
                     title = "建物内",
                     isSelected = selectedButton == "insideBuilding",
-                    onClick = { selectedButton = "insideBuilding" }
+                    onClick = { viewModel.updateSelectedButton("insideBuilding") }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 CustomElevatedButton(
                     title = "屋外",
                     isSelected = selectedButton == "outside",
-                    onClick = { selectedButton = "outside" }
+                    onClick = { viewModel.updateSelectedButton("outside") }
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -374,8 +384,8 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 modifier = Modifier.size(width = 314.dp, height = 100.dp),
-                value = landmark,
-                onValueChange = { landmark = it },
+                value = note,
+                onValueChange = { viewModel.updateNote(it) },
                 label = {
                     Text(
                         "例）自販機横、トイレ横", style = TextStyle(

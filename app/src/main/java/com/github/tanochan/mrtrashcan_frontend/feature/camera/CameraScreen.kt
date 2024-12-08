@@ -3,7 +3,6 @@ package com.github.tanochan.mrtrashcan_frontend.feature.camera
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import android.Manifest
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -14,9 +13,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -29,7 +26,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.feature.register.RegisterViewModel
@@ -43,10 +39,8 @@ fun CameraScreenHost(
     CameraScreen(
         onBack = {
             navigateToRegister()
-            Log.d("CameraScreenHost", "Navigating back to RegisterScreen")
         },
         onPhotoCaptured = { uri ->
-            Log.d("CameraScreenHost", "Captured photo URI: $uri")
             registerViewModel.updatePhotoUri(uri)
         }
     )
@@ -214,10 +208,6 @@ fun CameraScreen(
                                                     "写真を保存しました: ${photoFile.absolutePath}",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                Log.d(
-                                                    "CameraScreen",
-                                                    "Photo saved: ${photoFile.absolutePath}"
-                                                )
                                                 photoUri = photoFile.absolutePath
                                                 isPhotoCaptured = true
                                             }
