@@ -28,9 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +46,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.ui.component.CustomElevatedButton
-import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun RegisterScreenHost(
@@ -207,31 +203,31 @@ fun RegisterScreen(
                 ) {
                 IconButton(onClick = { viewModel.toggleBurning() }) {
                     Image(
-                        painter = painterResource(id = if (isBurningSelected) R.drawable.burning_on else R.drawable.burning_off),
+                        painter = painterResource(id = if (isBurningSelected) R.drawable.ic_burning_on else R.drawable.ic_burning_off),
                         contentDescription = "burning",
                     )
                 }
                 IconButton(onClick = { viewModel.toggleUnBurning() }) {
                     Image(
-                        painter = painterResource(id = if (isUnBurningSelected) R.drawable.unburning_on else R.drawable.unburning_off),
+                        painter = painterResource(id = if (isUnBurningSelected) R.drawable.ic_unburning_on else R.drawable.ic_unburning_off),
                         contentDescription = "unburning",
                     )
                 }
                 IconButton(onClick = { viewModel.toggleCan() }) {
                     Image(
-                        painter = painterResource(id = if (isCanSelected) R.drawable.can_on else R.drawable.can_off),
+                        painter = painterResource(id = if (isCanSelected) R.drawable.ic_can_on else R.drawable.ic_can_off),
                         contentDescription = "can",
                     )
                 }
                 IconButton(onClick = { viewModel.toggleBottle() }) {
                     Image(
-                        painter = painterResource(id = if (isBottleSelected) R.drawable.bottle_on else R.drawable.bottle_off),
+                        painter = painterResource(id = if (isBottleSelected) R.drawable.ic_bottle_on else R.drawable.ic_bottle_off),
                         contentDescription = "bottle",
                     )
                 }
                 IconButton(onClick = { viewModel.togglePetBottle() }) {
                     Image(
-                        painter = painterResource(id = if (isPetBottleSelected) R.drawable.pet_bottle_on else R.drawable.pet_bottle_off),
+                        painter = painterResource(id = if (isPetBottleSelected) R.drawable.ic_pet_bottle_on else R.drawable.ic_pet_bottle_off),
                         contentDescription = "pet_bottle",
                     )
                 }
