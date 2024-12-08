@@ -47,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.tanochan.mrtrashcan_frontend.R
 import com.github.tanochan.mrtrashcan_frontend.feature.RequestLocationPermission
 import com.github.tanochan.mrtrashcan_frontend.ui.ClickableBox
+import com.github.tanochan.mrtrashcan_frontend.ui.FilterFab
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -197,20 +198,16 @@ fun MapScreen(
             )
         }
 
-        FloatingActionButton(
-            onClick = {},
+        FilterFab(
+            onFilterSelected = { filterType ->
+                // 選択されたフィルタに基づいて処理を実行
+                println("Selected filter: $filterType")
+                // TODO: フィルタに基づいて表示内容を更新する処理を追加
+            },
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(bottom = 120.dp, start = 24.dp),
-            shape = CircleShape,
-            containerColor = Color.White
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.filter),
-                contentDescription = "Filter",
-                modifier = Modifier.size(28.dp),
-            )
-        }
+        )
 
         FloatingActionButton(
             onClick = {},
